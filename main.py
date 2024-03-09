@@ -7,6 +7,7 @@ from selenium import webdriver
 import time
 import os  # Needed for checking the existence of token.json
 
+
 # testing
 def open_links_safari(links):
     driver = webdriver.Safari()

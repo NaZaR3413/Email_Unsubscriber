@@ -128,6 +128,7 @@ def main(creds):
     
 # go through list, see if user wants to activate "is_clicked for any email"
     for email in emails:
+        print("\nfor " + email.name)
         var = input("is clicked?: ")
         if(var == "yes"):
             # change is clicked to true
