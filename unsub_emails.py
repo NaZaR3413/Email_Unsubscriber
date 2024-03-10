@@ -1,6 +1,7 @@
 from googleapiclient.discovery import build
 from quickstart import get_credentials  # Importing from quickstart.py
 from bs4 import BeautifulSoup
+import requests
 import re
 import base64
 import email
@@ -9,6 +10,7 @@ import utility
 # import unsub_selenium
 # from unsub_selenium import open_unsubscribe_links_in_safari
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import time
 
 def search_emails(service, query, max_results=6):
@@ -84,17 +86,45 @@ def extract_emails_from_content(email_content):
 
 def open_unsubscribe_links_in_safari(link):
     """
-    Opens unsubscribe links from a list of emails in Safari using Selenium.
+    Opens unsubscribe links from a list of emails in Google using Selenium.
+    opens with browswer 
     """
     if not link:
         print("No unsubscribe links to open.")
         return
 
-    driver = webdriver.Safari()
+    driver = webdriver.Chrome()
     driver.execute_script("window.open('{}');".format(link))
     print("link opened successfully")
     time.sleep(10)  # Time for the user to interact with the pages
     driver.quit()
+        
+        
+def open_link_without_browswer(link):
+    """
+    Opens unsubscribe links in Chrome in headless mode using Selenium.
+    """
+    if not link:
+        print("No unsubscribe links to open.")
+        return
+    
+    # Set up Chrome options for headless execution
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")  # Optional, recommended for Windows
+    options.add_argument('--log-level=3')  # This should suppress most of the informational messages
+
+
+    # Initialize the Chrome driver with options
+    driver = webdriver.Chrome(options=options)
+
+    try:
+        # open browserless window, give time to open and print if successful
+        driver.execute_script("window.open('{}');".format(link))
+        print("Link opened successfully")
+        time.sleep(5)  # Time for the page to process if needed
+    finally:
+        driver.quit()
 
 def main(creds):
     emails = []
@@ -118,7 +148,8 @@ def main(creds):
             mime_msg = get_mime_message(service, 'me', message['id'])
             if mime_msg:
                 link = find_unsubscribe_link(mime_msg)
-                
+                str(link)
+                                
                 utility.insert_email(emails, name, False, link) 
                 count += 1
                 print("\033[92mCounter: \033[0m" + str(count))
@@ -137,7 +168,8 @@ def main(creds):
     # open links for any "is clicked" emails
     for email in emails:
         if email.is_clicked == True:
-            open_unsubscribe_links_in_safari(email.link)
+            #open_unsubscribe_links_in_safari(email.link)
+            open_link_without_browswer(email.link)
             
             
 if __name__ == "__main__":
