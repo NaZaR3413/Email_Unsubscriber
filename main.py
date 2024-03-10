@@ -45,6 +45,7 @@ def layout_menu(): #displayed menu for all available options. Top line highlight
     print("Manage labels: \t\t\t2")
     print("Print menu: \t\t\t3")
     print("Quit: \t\t\t\t4")
+    print ("Test")
     
 if __name__ == "__main__": #start at main()
     main()
