@@ -106,7 +106,7 @@ def open_link_without_browswer(link):
     """
     if not link:
         print("No unsubscribe links to open.")
-        return
+        return 0
     
     # Set up Chrome options for headless execution
     options = Options()
@@ -123,11 +123,29 @@ def open_link_without_browswer(link):
         driver.execute_script("window.open('{}');".format(link))
         print("Link opened successfully")
         time.sleep(5)  # Time for the page to process if needed
+        
+        # confirm any activity
+        if "success" in driver.current_url: # if success is in the current page url
+            print("action appears to be succesful based on current url")
+            driver.quit()
+            return 1
+        elif "unsubscribed" in driver.page_source or "Unsubscribed" in driver.page_source or "UNSUBSCRIBED" in driver.page_source: # if unsubscribe is found anywhere in the page itself
+            print("action appers to be successful based on page contents")
+            driver.quit()
+            return 1
+        else: # no clear indication found, requires user input 
+            print("No clear success indicator found")
+            driver.quit()
+            return -1
+            
     finally:
         driver.quit()
 
 def main(creds):
-    emails = []
+    emails = [] # total list of emails 
+    success_list = [] # list of all successful unsubscriptions
+    unsucessful_list = [] # list of all unsucessful unsubscriptions
+    
     service = build('gmail', 'v1', credentials=creds)
 
     query = 'unsubscribe'
@@ -168,8 +186,19 @@ def main(creds):
     # open links for any "is clicked" emails
     for email in emails:
         if email.is_clicked == True:
+            print("\ncurrent email: " + email.name)
             #open_unsubscribe_links_in_safari(email.link)
-            open_link_without_browswer(email.link)
+            link_verifier = open_link_without_browswer(email.link)
+            
+            if link_verifier == 1: # add to success list if successful unsubscription 
+                utility.insert_email(success_list, email.name, email.is_clicked, email.link)
+            elif link_verifier == -1: # add to unsuccessful list of unsucessful unsubscription
+                utility.insert_email(unsucessful_list, email.name, email.is_clicked, email.link)
+            elif link_verifier == 0: # no link case
+                print("ERROR: No link available")
+            else:
+                print("ERROR: unexpected return: open_link_without_browser")
+                
             
             
 if __name__ == "__main__":
