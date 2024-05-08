@@ -3,13 +3,15 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from unsub_emails import main as unsub_emails_main
 from quickstart import get_credentials
+from quickstart import main as quickMain
 from selenium import webdriver
 import time
 import os  # Needed for checking the existence of token.json
 
 def main():
     # validate credentials 
-    creds = get_credentials()
+    # call the main function from quickstart
+    creds = quickMain()
     
     #switch variable for while
     state = 0
