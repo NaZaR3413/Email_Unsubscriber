@@ -1,4 +1,5 @@
-Application to mass unsubscribe from gmail emails. We are not liable for anything related to how this program is used.
+Program to mass unsubscribe from gmail emails. We are not liable for anything related to how this program is used.
+This program only contains code for gmail
 
 key notes:
 - Google API needed, the credentials posted on this project are not valid. Replace with your own.
